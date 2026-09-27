@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NubridgeMD — Matching · Doctor Accounts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --blue:#0889FC; --blue-d:#046BD0; --navy:#0B2545; --navy2:#13355C;
+  --teal:#0FB5A6; --gold:#E7A33E;
+  --ink:#1E2A38; --muted:#64748B; --faint:#94A3B8;
+  --bg:#F4F7FB; --surface:#FFFFFF; --surface2:#F8FAFD;
+  --line:#E4EAF1; --line2:#EEF2F7;
+  --green:#129E6A; --green-bg:#E4F6EE; --green-line:#B7E6CF;
+  --amber:#B7791F; --amber-bg:#FDF3DF; --amber-line:#F0DBA6;
+  --red:#D6455D; --red-bg:#FDE7EB; --red-line:#F5C2CC;
+  --shadow:0 1px 2px rgba(11,37,69,.05),0 6px 20px rgba(11,37,69,.07);
+  --shadow-lg:0 12px 40px rgba(11,37,69,.18);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Montserrat,Inter,sans-serif;margin:0}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--blue-d)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* Top bar */
+.topbar{background:var(--navy);color:#fff;position:sticky;top:0;z-index:30}
+.topbar .in{max-width:1120px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.logo svg{width:30px;height:30px;flex:none}
+.logo .t{font-family:Montserrat;font-weight:800;font-size:17px;letter-spacing:.2px;white-space:nowrap}
+.logo .t span{color:var(--teal)}
+.pill-admin{margin-left:4px;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;background:rgba(15,181,166,.16);color:#8EE7DC;border:1px solid rgba(15,181,166,.35);padding:3px 9px;border-radius:20px}
+.topbar .spacer{flex:1}
+.who{display:flex;align-items:center;gap:9px;font-size:13px;color:#B8C6DA}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(150deg,var(--teal),var(--blue));display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff;flex:none}
+
+/* Layout */
+.wrap{max-width:1120px;margin:0 auto;padding:22px 20px 60px}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:8px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.crumb b{color:var(--ink);font-weight:600}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.page-head h1{font-size:26px;color:var(--navy)}
+.page-head p{margin:4px 0 0;color:var(--muted);font-size:13.5px;max-width:60ch}
+.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-d)}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--blue);color:var(--blue-d)}
+.btn.sm{padding:7px 11px;font-size:12.5px;border-radius:8px}
+
+/* Controls row */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 14px}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font-weight:600;font-size:13px;padding:7px 14px;border-radius:7px}
+.seg button.on{background:var(--blue);color:#fff}
+.subtabs{display:inline-flex;gap:7px;flex-wrap:wrap}
+.subtab{border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:8px}
+.subtab.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.search{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+.search input{border:0;outline:0;flex:1;font-size:13.5px;background:transparent;color:var(--ink);min-width:0}
+.search svg{width:16px;height:16px;color:var(--faint);flex:none}
+
+/* Card / table */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+thead th{text-align:left;background:var(--surface2);color:var(--muted);font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--line)}
+tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface2)}
+.person{display:flex;align-items:center;gap:10px;min-width:0}
+.pa{width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff}
+.pa.md{background:linear-gradient(150deg,var(--navy2),var(--blue))}
+.pa.np{background:linear-gradient(150deg,var(--teal),#0a8f83)}
+.person .nm{font-weight:600;color:var(--ink);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .em{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+.chip.ACCEPTED{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line)}
+.chip.PENDING{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line)}
+.chip.REJECTED{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* Doctor grid */
+.docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.doccard{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px 14px;display:flex;flex-direction:column;min-width:0}
+.doccard .top{display:flex;gap:12px;align-items:flex-start}
+.doccard .pa{width:44px;height:44px;font-size:15px}
+.doccard h3{font-size:16px;color:var(--navy);line-height:1.2}
+.doccard .spec{font-size:12.5px;color:var(--teal);font-weight:600;margin-top:1px}
+.doccard .em{font-size:12px;color:var(--faint);margin-top:3px;word-break:break-all}
+.doccard .meta{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 0;font-size:12px;color:var(--muted)}
+.doccard .meta b{color:var(--ink);font-weight:600}
+.countrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.mini{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:8px}
+.mini.a{background:var(--green-bg);color:var(--green)}
+.mini.p{background:var(--amber-bg);color:var(--amber)}
+.mini.r{background:var(--red-bg);color:var(--red)}
+.doccard .foot{display:flex;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line2)}
+.doccard .foot .btn{flex:1;justify-content:center}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(11,37,69,.42);backdrop-filter:blur(2px);z-index:50;opacity:0;pointer-events:none;transition:opacity .18s}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,100%);background:var(--bg);z-index:60;box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.dhead{background:var(--navy);color:#fff;padding:18px 20px;display:flex;gap:13px;align-items:flex-start}
+.dhead .pa{width:48px;height:48px;font-size:16px}
+.dhead h2{font-size:18px}
+.dhead .sub{font-size:12.5px;color:#9DB6D2;margin-top:2px}
+.dhead .x{margin-left:auto;background:rgba(255,255,255,.12);border:0;color:#fff;width:32px;height:32px;border-radius:8px;font-size:17px;line-height:1;flex:none}
+.dhead .x:hover{background:rgba(255,255,255,.22)}
+.dbody{flex:1;overflow-y:auto;padding:18px 20px 30px}
+.sect{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+.sect .sh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line2)}
+.sect .sh h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--navy)}
+.sect .sb{padding:14px 16px}
+.adminonly{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border:1px solid var(--line);padding:3px 8px;border-radius:20px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1 / -1}
+.f label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.f .val{font-size:14px;color:var(--ink);font-weight:500;word-break:break-word}
+.f input,.f textarea,.f select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);width:100%}
+.f input:focus,.f textarea:focus,.f select:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,137,252,.12)}
+.f textarea{resize:vertical;min-height:60px}
+.saverow{display:flex;gap:9px;justify-content:flex-end;margin-top:4px}
+.savedmsg{font-size:12.5px;color:var(--green);font-weight:600;align-self:center;margin-right:auto;opacity:0;transition:opacity .2s}
+.savedmsg.show{opacity:1}
+
+.nplist{display:flex;flex-direction:column;gap:0}
+.npitem{display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid var(--line2)}
+.npitem:last-child{border-bottom:0}
+.npitem .nm{font-weight:600;font-size:13.5px}
+.npitem .em{font-size:11.5px;color:var(--faint)}
+.npitem .st{margin-left:auto}
+
+.sharebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sharebox input{flex:1;min-width:160px;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted);background:var(--surface2)}
+.sharenote{font-size:11.5px;color:var(--faint);margin-top:9px;line-height:1.5}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);z-index:90;opacity:0;pointer-events:none;transition:all .22s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Shared read-only view */
+.sharedpage{max-width:720px;margin:0 auto;padding:26px 20px 60px}
+.sharedbanner{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:22px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.sharedbanner .ro{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.sharedbanner h1{font-size:23px}
+.sharedbanner .s{color:#B8C6DA;font-size:13.5px;margin-top:5px}
+.backlink{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--blue-d);text-decoration:none;margin-bottom:14px}
+
+.footer{max-width:1120px;margin:0 auto;padding:22px 20px 40px;color:var(--faint);font-size:12px;text-align:center}
+
+@media (max-width:560px){
+  .fields{grid-template-columns:1fr}
+  .page-head h1{font-size:22px}
+  .logo .t{font-size:15px}
+  .who .nm-who{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="in">
+    <div class="logo">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <rect width="48" height="48" rx="11" fill="#0B2545"/>
+        <path d="M8 30c4-9 10-9 16-9s12 0 16 9" stroke="#0FB5A6" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+        <path d="M8 33h9l3-7 4 12 3-8 2 3h11" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="14" cy="18" r="2.6" fill="#E7A33E"/><circle cx="34" cy="18" r="2.6" fill="#E7A33E"/>
+      </svg>
+      <div class="t">Nubridge<span>MD</span></div>
+      <span class="pill-admin">Admin</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="who"><span class="nm-who">Admin Console</span><div class="avatar">AD</div></div>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<div class="footer" id="gfoot">NubridgeMD Admin · Matching — Doctor Accounts (prototype) · sample data for demonstration</div>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true"></aside>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- Sample data (mirrors real MatchRecord shape) ---------------- */
+const DOCTORS = [
+  {id:'md1', name:'Dr. Priya Nandakumar, MD', email:'p.nandakumar@nubridgemd.com', phone:'(602) 555-0181', npi:'1487654321', specialty:'Family Medicine', address:'2100 W Camelback Rd, Suite 210, Phoenix, AZ 85015', states:'AZ, NV, NM', capacity:'8 NPs', cred:'Verified', notes:'Prefers primary-care NPs. Capacity reviewed Q3.'},
+  {id:'md2', name:'Dr. Marcus Hale, DO', email:'m.hale@nubridgemd.com', phone:'(214) 555-0143', npi:'1990012345', specialty:'Psychiatry', address:'880 Commerce St, Dallas, TX 75202', states:'TX, OK', capacity:'6 NPs', cred:'Verified', notes:'Psych-mental health only.'},
+  {id:'md3', name:'Dr. Elena Fischer, MD', email:'e.fischer@nubridgemd.com', phone:'(305) 555-0117', npi:'1567890234', specialty:'Internal Medicine', address:'1450 Brickell Ave, Miami, FL 33131', states:'FL, GA', capacity:'10 NPs', cred:'Pending review', notes:''},
+  {id:'md4', name:'Dr. Samuel Okoro, MD', email:'s.okoro@nubridgemd.com', phone:'(773) 555-0199', npi:'1345678901', specialty:'Cardiology', address:'233 E Erie St, Chicago, IL 60611', states:'IL, IN, WI', capacity:'4 NPs', cred:'Verified', notes:''},
+  {id:'md5', name:'Dr. Hannah Berg, DO', email:'h.berg@nubridgemd.com', phone:'(206) 555-0166', npi:'1234509876', specialty:'Family Medicine', address:'1100 Olive Way, Seattle, WA 98101', states:'WA, OR', capacity:'7 NPs', cred:'Verified', notes:'Telehealth-first practice.'},
+];
+const MATCHES = [
+  {matchGuid:'MTC-1001', mdId:'md1', npName:'NP Ada Aluko', npEmail:'a.aluko@np.example', status:'ACCEPTED', createdAt:'2026-08-14'},
+  {matchGuid:'MTC-1002', mdId:'md1', npName:'NP Grace Liu', npEmail:'g.liu@np.example', status:'ACCEPTED', createdAt:'2026-08-21'},
+  {matchGuid:'MTC-1003', mdId:'md1', npName:'NP Terrell Banks', npEmail:'t.banks@np.example', status:'PENDING', createdAt:'2026-09-09'},
+  {matchGuid:'MTC-1004', mdId:'md2', npName:'NP Sofia Reyes', npEmail:'s.reyes@np.example', status:'ACCEPTED', createdAt:'2026-07-30'},
+  {matchGuid:'MTC-1005', mdId:'md2', npName:'NP Daniel Kim', npEmail:'d.kim@np.example', status:'ACCEPTED', createdAt:'2026-08-05'},
+  {matchGuid:'MTC-1006', mdId:'md2', npName:'NP Olivia Grant', npEmail:'o.grant@np.example', status:'REJECTED', createdAt:'2026-08-18'},
+  {matchGuid:'MTC-1007', mdId:'md3', npName:'NP Rachel Adeyemi', npEmail:'r.adeyemi@np.example', status:'PENDING', createdAt:'2026-09-11'},
+  {matchGuid:'MTC-1008', mdId:'md3', npName:'NP James Porter', npEmail:'j.porter@np.example', status:'ACCEPTED', createdAt:'2026-08-27'},
+  {matchGuid:'MTC-1009', mdId:'md3', npName:'NP Mei Chen', npEmail:'m.chen@np.example', status:'ACCEPTED', createdAt:'2026-09-02'},
+  {matchGuid:'MTC-1010', mdId:'md3', npName:'NP Carlos Vega', npEmail:'c.vega@np.example', status:'PENDING', createdAt:'2026-09-15'},
+  {matchGuid:'MTC-1011', mdId:'md4', npName:'NP Whitney Cole', npEmail:'w.cole@np.example', status:'ACCEPTED', createdAt:'2026-08-08'},
+  {matchGuid:'MTC-1012', mdId:'md4', npName:'NP Ibrahim Salam', npEmail:'i.salam@np.example', status:'REJECTED', createdAt:'2026-08-22'},
+  {matchGuid:'MTC-1013', mdId:'md5', npName:'NP Emily Novak', npEmail:'e.novak@np.example', status:'ACCEPTED', createdAt:'2026-09-01'},
+  {matchGuid:'MTC-1014', mdId:'md5', npName:'NP Trevor Blake', npEmail:'t.blake@np.example', status:'ACCEPTED', createdAt:'2026-09-04'},
+  {matchGuid:'MTC-1015', mdId:'md5', npName:'NP Priscilla Owen', npEmail:'p.owen@np.example', status:'PENDING', createdAt:'2026-09-18'},
+];
+
+/* ---------------- State + persistence (admin edits) ---------------- */
+const LS_KEY='nbmd_md_accounts_v1';
+function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(e){ return {}; } }
+function saveOverrides(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); }catch(e){} }
+let overrides = loadOverrides();
+function doctor(id){ const base = DOCTORS.find(d=>d.id===id); return Object.assign({}, base, overrides[id]||{}); }
+function matchesFor(id){ return MATCHES.filter(m=>m.mdId===id); }
+function counts(id){ const ms=matchesFor(id); return {a:ms.filter(m=>m.status==='ACCEPTED').length, p:ms.filter(m=>m.status==='PENDING').length, r:ms.filter(m=>m.status==='REJECTED').length, total:ms.length}; }
+function initials(name){ const c=name.replace(/^(Dr\.|NP)\s+/,'').trim().split(/\s+/); return ((c[0]||'')[0]||'')+((c[1]||'')[0]||''); }
+
+let view='doctor';      // 'match' | 'doctor'
+let statusFilter='ALL'; // ALL | ACCEPTED | PENDING | REJECTED
+let query='';
+
+/* ---------------- Rendering ---------------- */
+const app=document.getElementById('app');
+
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function render(){
+  const hash=new URLSearchParams(location.hash.slice(1));
+  if(hash.get('share') && hash.get('d')){ renderShared(hash.get('d')); return; }
+  document.getElementById('gfoot').hidden=false;
+  app.innerHTML = `
+    <div class="wrap">
+      <div class="crumb">Admin <span>›</span> <b>Matching</b></div>
+      <div class="page-head">
+        <div>
+          <h1>Matching</h1>
+          <p>Physician–NP collaborations. Switch to <b>By&nbsp;doctor</b> to open each matched physician's account, review every NP linked to them, edit their details, and copy a shareable read-only link.</p>
+        </div>
+        <button class="btn primary" onclick="toast('Match Users — opens the manual matching flow in the live app')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Match Users</button>
+      </div>
+
+      <div class="controls">
+        <div class="seg">
+          <button class="${view==='match'?'on':''}" onclick="setView('match')">By match</button>
+          <button class="${view==='doctor'?'on':''}" onclick="setView('doctor')">By doctor</button>
+        </div>
+        <div class="subtabs">
+          ${['ALL','ACCEPTED','PENDING','REJECTED'].map(s=>`<button class="subtab ${statusFilter===s?'on':''}" onclick="setStatus('${s}')">${s==='ALL'?'All':s[0]+s.slice(1).toLowerCase()}</button>`).join('')}
+        </div>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input placeholder="Search physician, NP or email…" value="${esc(query)}" oninput="setQuery(this.value)">
+        </div>
+      </div>
+
+      <div id="listarea">${ view==='doctor' ? doctorView() : matchView() }</div>
+    </div>`;
+}
+
+function matchesFiltered(){
+  return MATCHES.filter(m=>{
+    if(statusFilter!=='ALL' && m.status!==statusFilter) return false;
+    if(query){ const d=doctor(m.mdId); const q=query.toLowerCase();
+      if(!(d.name.toLowerCase().includes(q)||d.email.toLowerCase().includes(q)||m.npName.toLowerCase().includes(q)||m.npEmail.toLowerCase().includes(q))) return false; }
+    return true;
+  });
+}
+
+function matchView(){
+  const rows=matchesFiltered();
+  if(!rows.length) return `<div class="card"><div class="empty">No matches for this filter.</div></div>`;
+  return `<div class="card"><div class="tablewrap"><table>
+    <thead><tr><th>Physician</th><th>Nurse Practitioner</th><th>Status</th><th>Date created</th><th></th></tr></thead>
+    <tbody>${rows.map(m=>{const d=doctor(m.mdId);return `<tr>
+      <td><div class="person"><div class="pa md">${esc(initials(d.name))}</div><div style="min-width:0"><div class="nm">${esc(d.name)}</div><div class="em">${esc(d.email)}</div></div></div></td>
+      <td><div class="person"><div class="pa np">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)}</div></div></div></td>
+      <td><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></td>
+      <td class="tnum" style="color:var(--muted)">${esc(m.createdAt)}</td>
+      <td style="text-align:right"><button class="btn ghost sm" onclick="openDrawer('${d.id}')">Open account</button></td>
+    </tr>`;}).join('')}</tbody></table></div></div>`;
+}
+
+function doctorView(){
+  const q=query.toLowerCase();
+  const docs=DOCTORS.filter(base=>{
+    const d=doctor(base.id); const ms=matchesFor(base.id);
+    if(statusFilter!=='ALL' && !ms.some(m=>m.status===statusFilter)) return false;
+    if(query && !(d.name.toLowerCase().includes(q)||d.email.toLowerCase().includes(q)||ms.some(m=>m.npName.toLowerCase().includes(q)||m.npEmail.toLowerCase().includes(q)))) return false;
+    return true;
+  });
+  if(!docs.length) return `<div class="card"><div class="empty">No physicians for this filter.</div></div>`;
+  return `<div class="docgrid">${docs.map(base=>{ const d=doctor(base.id); const c=counts(base.id); return `
+    <div class="doccard">
+      <div class="top">
+        <div class="pa md">${esc(initials(d.name))}</div>
+        <div style="min-width:0;flex:1">
+          <h3>${esc(d.name)}</h3>
+          <div class="spec">${esc(d.specialty)}</div>
+          <div class="em">${esc(d.email)}</div>
+        </div>
+      </div>
+      <div class="meta"><span>Licensed: <b>${esc(d.states)}</b></span><span>Capacity: <b>${esc(d.capacity)}</b></span></div>
+      <div class="countrow">
+        <span class="mini a">${c.a} accepted</span>
+        ${c.p?`<span class="mini p">${c.p} pending</span>`:''}
+        ${c.r?`<span class="mini r">${c.r} rejected</span>`:''}
+      </div>
+      <div class="foot">
+        <button class="btn primary sm" onclick="openDrawer('${d.id}')">View account</button>
+        <button class="btn ghost sm" onclick="copyShare('${d.id}')">Copy link</button>
+      </div>
+    </div>`;}).join('')}</div>`;
+}
+
+/* ---------------- Drawer (admin editable) ---------------- */
+let editing=false;
+function openDrawer(id){
+  editing=false;
+  const dr=document.getElementById('drawer');
+  dr.innerHTML=drawerHTML(id);
+  dr.classList.add('open');
+  document.getElementById('scrim').classList.add('open');
+  document.body.style.overflow='hidden';
+  dr.dataset.id=id;
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('scrim').classList.remove('open');
+  document.body.style.overflow='';
+}
+function drawerHTML(id){
+  const d=doctor(id); const ms=matchesFor(id); const c=counts(id);
+  const shareUrl=shareLink(id);
+  const field=(label,key,val,full)=> editing
+    ? `<div class="f ${full?'full':''}"><label>${label}</label>${key==='notes'?`<textarea data-k="notes">${esc(val)}</textarea>`:key==='cred'?`<select data-k="cred"><option${val==='Verified'?' selected':''}>Verified</option><option${val==='Pending review'?' selected':''}>Pending review</option><option${val==='Suspended'?' selected':''}>Suspended</option></select>`:`<input data-k="${key}" value="${esc(val)}">`}</div>`
+    : `<div class="f ${full?'full':''}"><label>${label}</label><div class="val">${esc(val)||'<span style=\"color:var(--faint)\">—</span>'}</div></div>`;
+  return `
+    <div class="dhead">
+      <div class="pa md">${esc(initials(d.name))}</div>
+      <div style="min-width:0">
+        <h2>${esc(d.name)}</h2>
+        <div class="sub">${esc(d.specialty)} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} active</div>
+      </div>
+      <button class="x" onclick="closeDrawer()" aria-label="Close">×</button>
+    </div>
+    <div class="dbody">
+      <div class="sect">
+        <div class="sh"><h4>Doctor account</h4>${editing?`<span class="adminonly">Editing</span>`:`<span class="adminonly">Admin only</span>`}</div>
+        <div class="sb">
+          <div class="fields">
+            ${field('Full name','name',d.name)}
+            ${field('Specialty','specialty',d.specialty)}
+            ${field('Email','email',d.email)}
+            ${field('Phone','phone',d.phone)}
+            ${field('NPI','npi',d.npi)}
+            ${field('Credential status','cred',d.cred)}
+            ${field('Licensed states','states',d.states)}
+            ${field('Collaboration capacity','capacity',d.capacity)}
+            ${field('Practice address','address',d.address,true)}
+            ${field('Admin notes','notes',d.notes,true)}
+          </div>
+          <div class="saverow" style="margin-top:14px">
+            <span class="savedmsg" id="savedmsg">Saved ✓</span>
+            ${editing
+              ? `<button class="btn ghost sm" onclick="cancelEdit('${id}')">Cancel</button><button class="btn primary sm" onclick="saveEdit('${id}')">Save changes</button>`
+              : `<button class="btn primary sm" onclick="startEdit('${id}')">Edit details</button>`}
+          </div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="sh"><h4>Matched nurse practitioners (${c.total})</h4></div>
+        <div class="sb">
+          <div class="nplist">
+            ${ms.length?ms.map(m=>`<div class="npitem">
+              <div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div>
+              <div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(m.createdAt)}</div></div>
+              <span class="st"><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></span>
+            </div>`).join(''):'<div style="color:var(--muted);font-size:13px">No NPs matched yet.</div>'}
+          </div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="sh"><h4>Shareable link</h4><span class="adminonly">Read-only</span></div>
+        <div class="sb">
+          <div class="sharebox">
+            <input id="shareinput" readonly value="${esc(shareUrl)}" onclick="this.select()">
+            <button class="btn ghost sm" onclick="copyShare('${id}')">Copy</button>
+            <button class="btn primary sm" onclick="window.open('${esc(shareUrl)}','_blank')">Open</button>
+          </div>
+          <div class="sharenote">Anyone with this link opens a clean, <b>read-only</b> view of ${esc(d.name.split(',')[0])}'s account and their matched NPs — for sharing or presentation. Editing stays admin-only inside this console.</div>
+        </div>
+      </div>
+    </div>`;
+}
+function startEdit(id){ editing=true; openDrawerRefresh(id); }
+function cancelEdit(id){ editing=false; openDrawerRefresh(id); }
+function openDrawerRefresh(id){ const dr=document.getElementById('drawer'); dr.innerHTML=drawerHTML(id); }
+function saveEdit(id){
+  const dr=document.getElementById('drawer');
+  const o=overrides[id]||{};
+  dr.querySelectorAll('[data-k]').forEach(el=>{ o[el.getAttribute('data-k')]=el.value; });
+  overrides[id]=o; saveOverrides(overrides);
+  editing=false; openDrawerRefresh(id);
+  const m=document.getElementById('savedmsg'); if(m){ m.classList.add('show'); setTimeout(()=>m.classList.remove('show'),1800); }
+  toast('Doctor account updated');
+  render(); // reflect name/specialty changes in the list behind
+}
+
+/* ---------------- Sharing ---------------- */
+function shareLink(id){ return location.origin+location.pathname+'#d='+id+'&share=1'; }
+function copyShare(id){
+  const url=shareLink(id);
+  const done=()=>toast('Shareable link copied');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,()=>fallbackCopy(url,done)); }
+  else fallbackCopy(url,done);
+}
+function fallbackCopy(text,cb){ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); try{document.execCommand('copy');}catch(e){} t.remove(); cb&&cb(); }
+
+/* ---------------- Shared read-only view ---------------- */
+function renderShared(id){
+  const base=DOCTORS.find(x=>x.id===id);
+  document.getElementById('gfoot').hidden=true;
+  if(!base){ app.innerHTML=`<div class="sharedpage"><p>Doctor not found.</p><a class="backlink" href="#">← Back to Matching</a></div>`; return; }
+  const d=doctor(id); const ms=matchesFor(id); const c=counts(id);
+  app.innerHTML=`
+    <div class="sharedpage">
+      <a class="backlink" href="#" onclick="location.hash='';return false;">← Back to admin console</a>
+      <div class="sharedbanner">
+        <span class="ro">Shared · read-only</span>
+        <h1>${esc(d.name)}</h1>
+        <div class="s">${esc(d.specialty)} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} active collaboration${c.a===1?'':'s'}</div>
+      </div>
+      <div class="sect">
+        <div class="sh"><h4>Physician details</h4></div>
+        <div class="sb"><div class="fields">
+          <div class="f"><label>Email</label><div class="val">${esc(d.email)}</div></div>
+          <div class="f"><label>Phone</label><div class="val">${esc(d.phone)}</div></div>
+          <div class="f"><label>NPI</label><div class="val">${esc(d.npi)}</div></div>
+          <div class="f"><label>Credential status</label><div class="val">${esc(d.cred)}</div></div>
+          <div class="f"><label>Licensed states</label><div class="val">${esc(d.states)}</div></div>
+          <div class="f"><label>Collaboration capacity</label><div class="val">${esc(d.capacity)}</div></div>
+          <div class="f full"><label>Practice address</label><div class="val">${esc(d.address)}</div></div>
+        </div></div>
+      </div>
+      <div class="sect">
+        <div class="sh"><h4>Matched nurse practitioners (${c.total})</h4></div>
+        <div class="sb"><div class="nplist">
+          ${ms.map(m=>`<div class="npitem"><div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">matched ${esc(m.createdAt)}</div></div><span class="st"><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></span></div>`).join('')}
+        </div></div>
+      </div>
+      <p style="text-align:center;color:var(--faint);font-size:12px;margin-top:18px">NubridgeMD · Physician collaboration record · read-only shared view</p>
+    </div>`;
+}
+
+/* ---------------- Controls ---------------- */
+function setView(v){ view=v; render(); }
+function setStatus(s){ statusFilter=s; render(); }
+let qt; function setQuery(v){ query=v; clearTimeout(qt); qt=setTimeout(render,140); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+
+window.addEventListener('hashchange',render);
+render();
+</script>
+</body>
+</html>
