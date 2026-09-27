@@ -193,7 +193,7 @@ tbody tr:hover{background:var(--surface2)}
 
 <div id="app"></div>
 
-<div class="footer" id="gfoot">NubridgeMD Admin · Matching — Doctor Accounts (prototype) · sample data for demonstration</div>
+<div class="footer" id="gfoot">NubridgeMD Admin · Matching — Physician Accounts · 7 physicians · 25 matched NPs (from the Accepted / Completed list). Admin edits are saved in this browser for the prototype.</div>
 
 <div class="scrim" id="scrim" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true"></aside>
@@ -202,28 +202,48 @@ tbody tr:hover{background:var(--surface2)}
 <script>
 /* ---------------- Sample data (mirrors real MatchRecord shape) ---------------- */
 const DOCTORS = [
-  {id:'md1', name:'Dr. Priya Nandakumar, MD', email:'p.nandakumar@nubridgemd.com', phone:'(602) 555-0181', npi:'1487654321', specialty:'Family Medicine', address:'2100 W Camelback Rd, Suite 210, Phoenix, AZ 85015', states:'AZ, NV, NM', capacity:'8 NPs', cred:'Verified', notes:'Prefers primary-care NPs. Capacity reviewed Q3.'},
-  {id:'md2', name:'Dr. Marcus Hale, DO', email:'m.hale@nubridgemd.com', phone:'(214) 555-0143', npi:'1990012345', specialty:'Psychiatry', address:'880 Commerce St, Dallas, TX 75202', states:'TX, OK', capacity:'6 NPs', cred:'Verified', notes:'Psych-mental health only.'},
-  {id:'md3', name:'Dr. Elena Fischer, MD', email:'e.fischer@nubridgemd.com', phone:'(305) 555-0117', npi:'1567890234', specialty:'Internal Medicine', address:'1450 Brickell Ave, Miami, FL 33131', states:'FL, GA', capacity:'10 NPs', cred:'Pending review', notes:''},
-  {id:'md4', name:'Dr. Samuel Okoro, MD', email:'s.okoro@nubridgemd.com', phone:'(773) 555-0199', npi:'1345678901', specialty:'Cardiology', address:'233 E Erie St, Chicago, IL 60611', states:'IL, IN, WI', capacity:'4 NPs', cred:'Verified', notes:''},
-  {id:'md5', name:'Dr. Hannah Berg, DO', email:'h.berg@nubridgemd.com', phone:'(206) 555-0166', npi:'1234509876', specialty:'Family Medicine', address:'1100 Olive Way, Seattle, WA 98101', states:'WA, OR', capacity:'7 NPs', cred:'Verified', notes:'Telehealth-first practice.'},
+  {id:'md-aaron',    name:'Aaron Brown',       email:'aaroniam41@gmail.com',          phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-senait',   name:'Senait Adebo',      email:'adeboclinic@gmail.com',         phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-allamon',  name:'Patricia Allamon',  email:'drpallamon@gmail.com',          phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-bilal',    name:'Muhammad Bilal',    email:'methelazyone@gmail.com',        phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-saswatha', name:'Saswatha Anireddy', email:'saswatha.anireddy1@gmail.com',  phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-nancy',    name:'Nancy Gegbe',       email:'nancygegbe@gmail.com',          phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
+  {id:'md-corbin',   name:'Corbin Stephens',   email:'corbincstephens@gmail.com',     phone:'', npi:'', specialty:'', address:'', states:'', capacity:'', cred:'Not set', notes:''},
 ];
+// Real matches from the admin Matching dashboard (Accepted / Completed). tier & paidAt unknown — admin can fill later.
 const MATCHES = [
-  {matchGuid:'MTC-1001', mdId:'md1', npName:'NP Ada Aluko', npEmail:'a.aluko@np.example', status:'ACCEPTED', createdAt:'2026-08-14', tier:'StartUp',  paidAt:'2026-09-01'},
-  {matchGuid:'MTC-1002', mdId:'md1', npName:'NP Grace Liu', npEmail:'g.liu@np.example', status:'ACCEPTED', createdAt:'2026-08-21', tier:'Standard', paidAt:'2026-09-01'},
-  {matchGuid:'MTC-1003', mdId:'md1', npName:'NP Terrell Banks', npEmail:'t.banks@np.example', status:'PENDING', createdAt:'2026-09-09', tier:'StartUp',  paidAt:''},
-  {matchGuid:'MTC-1004', mdId:'md2', npName:'NP Sofia Reyes', npEmail:'s.reyes@np.example', status:'ACCEPTED', createdAt:'2026-07-30', tier:'Premium',  paidAt:'2026-09-03'},
-  {matchGuid:'MTC-1005', mdId:'md2', npName:'NP Daniel Kim', npEmail:'d.kim@np.example', status:'ACCEPTED', createdAt:'2026-08-05', tier:'Standard', paidAt:'2026-09-02'},
-  {matchGuid:'MTC-1006', mdId:'md2', npName:'NP Olivia Grant', npEmail:'o.grant@np.example', status:'REJECTED', createdAt:'2026-08-18', tier:'StartUp',  paidAt:''},
-  {matchGuid:'MTC-1007', mdId:'md3', npName:'NP Rachel Adeyemi', npEmail:'r.adeyemi@np.example', status:'PENDING', createdAt:'2026-09-11', tier:'StartUp',  paidAt:''},
-  {matchGuid:'MTC-1008', mdId:'md3', npName:'NP James Porter', npEmail:'j.porter@np.example', status:'ACCEPTED', createdAt:'2026-08-27', tier:'Standard', paidAt:'2026-09-05'},
-  {matchGuid:'MTC-1009', mdId:'md3', npName:'NP Mei Chen', npEmail:'m.chen@np.example', status:'ACCEPTED', createdAt:'2026-09-02', tier:'Premium',  paidAt:'2026-09-05'},
-  {matchGuid:'MTC-1010', mdId:'md3', npName:'NP Carlos Vega', npEmail:'c.vega@np.example', status:'PENDING', createdAt:'2026-09-15', tier:'StartUp',  paidAt:''},
-  {matchGuid:'MTC-1011', mdId:'md4', npName:'NP Whitney Cole', npEmail:'w.cole@np.example', status:'ACCEPTED', createdAt:'2026-08-08', tier:'Premium',  paidAt:'2026-09-01'},
-  {matchGuid:'MTC-1012', mdId:'md4', npName:'NP Ibrahim Salam', npEmail:'i.salam@np.example', status:'REJECTED', createdAt:'2026-08-22', tier:'Standard', paidAt:''},
-  {matchGuid:'MTC-1013', mdId:'md5', npName:'NP Emily Novak', npEmail:'e.novak@np.example', status:'ACCEPTED', createdAt:'2026-09-01', tier:'Standard', paidAt:'2026-09-02'},
-  {matchGuid:'MTC-1014', mdId:'md5', npName:'NP Trevor Blake', npEmail:'t.blake@np.example', status:'ACCEPTED', createdAt:'2026-09-04', tier:'StartUp',  paidAt:'2026-09-04'},
-  {matchGuid:'MTC-1015', mdId:'md5', npName:'NP Priscilla Owen', npEmail:'p.owen@np.example', status:'PENDING', createdAt:'2026-09-18', tier:'Standard', paidAt:''},
+  // Aaron Brown
+  {matchGuid:'M-0001', mdId:'md-aaron', npName:'Kevin Bruce', npEmail:'Kbocho8@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-24', tier:'', paidAt:''},
+  {matchGuid:'M-0002', mdId:'md-aaron', npName:'Bernice Ohene', npEmail:'bohene89@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-16', tier:'', paidAt:''},
+  {matchGuid:'M-0003', mdId:'md-aaron', npName:'Sadaf Khan', npEmail:'sadaf.khan@psychiatryandwellnessofgeorgia.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-14', tier:'', paidAt:''},
+  {matchGuid:'M-0004', mdId:'md-aaron', npName:'Dorcas Mwangi', npEmail:'dorcas.mwangi@psychiatryandwellnessofgeorgia.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-14', tier:'', paidAt:''},
+  {matchGuid:'M-0005', mdId:'md-aaron', npName:'Onyeka Uti', npEmail:'utionyeka@yahoo.co.uk', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-02', tier:'', paidAt:''},
+  {matchGuid:'M-0006', mdId:'md-aaron', npName:'Shannon Dean', npEmail:'shannon.dean@psychiatryandwellnessofgeorgia.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-30', tier:'', paidAt:''},
+  {matchGuid:'M-0007', mdId:'md-aaron', npName:'Lola Ogunniyi', npEmail:'lollynicole@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-26', tier:'', paidAt:''},
+  {matchGuid:'M-0008', mdId:'md-aaron', npName:'Sasha Grant', npEmail:'sasha.grant@psychiatryandwellnessofgeorgia.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-25', tier:'', paidAt:''},
+  // Senait Adebo
+  {matchGuid:'M-0009', mdId:'md-senait', npName:'Adaamaka Ogbechie', npEmail:'adaamakaogbechie@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-12', tier:'', paidAt:''},
+  {matchGuid:'M-0010', mdId:'md-senait', npName:'Chantel Parker', npEmail:'chantelparker84@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-27', tier:'', paidAt:''},
+  {matchGuid:'M-0011', mdId:'md-senait', npName:'Omotola Johnson', npEmail:'tolade70@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-27', tier:'', paidAt:''},
+  {matchGuid:'M-0012', mdId:'md-senait', npName:'Ewoma Obaro', npEmail:'ewoma2253@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-25', tier:'', paidAt:''},
+  {matchGuid:'M-0013', mdId:'md-senait', npName:'Nneka Onoh', npEmail:'changesqueen4@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-12', tier:'', paidAt:''},
+  {matchGuid:'M-0014', mdId:'md-senait', npName:'Folukemi Olawepo', npEmail:'folukemiolawepo@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-08-06', tier:'', paidAt:''},
+  // Patricia Allamon
+  {matchGuid:'M-0015', mdId:'md-allamon', npName:'Techa Bryant', npEmail:'techabryant55@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-14', tier:'', paidAt:''},
+  {matchGuid:'M-0016', mdId:'md-allamon', npName:'Yvette Brooks', npEmail:'ybrooks228@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-06-10', tier:'', paidAt:''},
+  {matchGuid:'M-0017', mdId:'md-allamon', npName:'Pauline Iromini', npEmail:'pauline11246@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-06-10', tier:'', paidAt:''},
+  {matchGuid:'M-0018', mdId:'md-allamon', npName:'Chigozie Achubie', npEmail:'healingsoulhealthcare@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-05-21', tier:'', paidAt:''},
+  // Muhammad Bilal
+  {matchGuid:'M-0019', mdId:'md-bilal', npName:'Kenechukwu Eluesike', npEmail:'kenechukwu53@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-21', tier:'', paidAt:''},
+  {matchGuid:'M-0020', mdId:'md-bilal', npName:'Benedicta Ezenwenyi', npEmail:'benedicta.ezenwenyi@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-20', tier:'', paidAt:''},
+  {matchGuid:'M-0021', mdId:'md-bilal', npName:'Akua Nyarko', npEmail:'nyarko_akua@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-18', tier:'', paidAt:''},
+  // Saswatha Anireddy
+  {matchGuid:'M-0022', mdId:'md-saswatha', npName:'Bernice Ohene', npEmail:'bohene89@gmail.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-20', tier:'', paidAt:''},
+  {matchGuid:'M-0023', mdId:'md-saswatha', npName:'Ben Osevwe', npEmail:'ben@holytrinitybhs.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-06-02', tier:'', paidAt:''},
+  // Nancy Gegbe
+  {matchGuid:'M-0024', mdId:'md-nancy', npName:'Patricia Ayika', npEmail:'chioma.patricia@yahoo.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-09-24', tier:'', paidAt:''},
+  // Corbin Stephens
+  {matchGuid:'M-0025', mdId:'md-corbin', npName:'Asana Aruna', npEmail:'info@asanacarementalwellness.com', status:'ACCEPTED', sd:'Completed', createdAt:'2026-06-10', tier:'', paidAt:''},
 ];
 
 /* ---------------- State + persistence (admin edits) ---------------- */
@@ -244,6 +264,9 @@ let query='';
 const app=document.getElementById('app');
 
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtD(s){ if(!s) return '—'; const d=new Date(s); if(isNaN(d.getTime())) return String(s); return d.toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}); }
+function statusLabel(m){ return m.sd || (m.status[0]+m.status.slice(1).toLowerCase()); }
+function or(v,fb){ return (v&&String(v).trim())?v:fb; }
 
 function render(){
   const hash=new URLSearchParams(location.hash.slice(1));
@@ -295,10 +318,10 @@ function matchView(){
     <tbody>${rows.map(m=>{const d=doctor(m.mdId);return `<tr>
       <td><div class="person"><div class="pa md">${esc(initials(d.name))}</div><div style="min-width:0"><div class="nm">${esc(d.name)}</div><div class="em">${esc(d.email)}</div></div></div></td>
       <td><div class="person"><div class="pa np">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)}</div></div></div></td>
-      <td><span class="tier ${esc(m.tier)}">${esc(m.tier)}</span></td>
-      <td><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></td>
-      <td class="tnum" style="color:var(--muted)">${esc(m.createdAt)}</td>
-      <td class="tnum paid" style="color:var(--muted)">${m.paidAt?esc(m.paidAt):'<span class="none">—</span>'}</td>
+      <td>${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:'<span class="paid"><span class="none">—</span></span>'}</td>
+      <td><span class="chip ${m.status}">${esc(statusLabel(m))}</span></td>
+      <td class="tnum" style="color:var(--muted)">${esc(fmtD(m.createdAt))}</td>
+      <td class="tnum paid" style="color:var(--muted)">${m.paidAt?esc(fmtD(m.paidAt)):'<span class="none">—</span>'}</td>
       <td style="text-align:right"><button class="btn ghost sm" onclick="openDrawer('${d.id}')">Open account</button></td>
     </tr>`;}).join('')}</tbody></table></div></div>`;
 }
@@ -318,13 +341,13 @@ function doctorView(){
         <div class="pa md">${esc(initials(d.name))}</div>
         <div style="min-width:0;flex:1">
           <h3>${esc(d.name)}</h3>
-          <div class="spec">${esc(d.specialty)}</div>
+          <div class="spec">${esc(or(d.specialty,'Specialty not set'))}</div>
           <div class="em">${esc(d.email)}</div>
         </div>
       </div>
-      <div class="meta"><span>Licensed: <b>${esc(d.states)}</b></span><span>Capacity: <b>${esc(d.capacity)}</b></span></div>
+      <div class="meta"><span>Licensed: <b>${esc(or(d.states,'—'))}</b></span><span>Capacity: <b>${esc(or(d.capacity,'—'))}</b></span></div>
       <div class="countrow">
-        <span class="mini a">${c.a} accepted</span>
+        <span class="mini a">${c.a} completed</span>
         ${c.p?`<span class="mini p">${c.p} pending</span>`:''}
         ${c.r?`<span class="mini r">${c.r} rejected</span>`:''}
       </div>
@@ -362,7 +385,7 @@ function drawerHTML(id){
       <div class="pa md">${esc(initials(d.name))}</div>
       <div style="min-width:0">
         <h2>${esc(d.name)}</h2>
-        <div class="sub">${esc(d.specialty)} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} active</div>
+        <div class="sub">${esc(or(d.specialty,'Physician'))} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} completed</div>
       </div>
       <button class="x" onclick="closeDrawer()" aria-label="Close">×</button>
     </div>
@@ -397,8 +420,8 @@ function drawerHTML(id){
           <div class="nplist">
             ${ms.length?ms.map(m=>`<div class="npitem">
               <div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div>
-              <div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(m.createdAt)} · ${m.paidAt?'paid '+esc(m.paidAt):'no payment yet'}</div></div>
-              <span class="st" style="display:flex;gap:7px;align-items:center"><span class="tier ${esc(m.tier)}">${esc(m.tier)}</span><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></span>
+              <div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}</div></div>
+              <span class="st" style="display:flex;gap:7px;align-items:center">${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:''}<span class="chip ${m.status}">${esc(statusLabel(m))}</span></span>
             </div>`).join(''):'<div style="color:var(--muted);font-size:13px">No NPs matched yet.</div>'}
           </div>
         </div>
@@ -453,7 +476,7 @@ function renderShared(id){
       <div class="sharedbanner">
         <span class="ro">Shared · read-only</span>
         <h1>${esc(d.name)}</h1>
-        <div class="s">${esc(d.specialty)} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} active collaboration${c.a===1?'':'s'}</div>
+        <div class="s">${esc(or(d.specialty,'Physician'))} · ${c.total} NP${c.total===1?'':'s'} matched · ${c.a} completed collaboration${c.a===1?'':'s'}</div>
       </div>
       <div class="sect">
         <div class="sh"><h4>Physician details</h4></div>
@@ -470,7 +493,7 @@ function renderShared(id){
       <div class="sect">
         <div class="sh"><h4>Matched nurse practitioners (${c.total})</h4></div>
         <div class="sb"><div class="nplist">
-          ${ms.map(m=>`<div class="npitem"><div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">matched ${esc(m.createdAt)} · ${m.paidAt?'paid '+esc(m.paidAt):'no payment yet'}</div></div><span class="st" style="display:flex;gap:7px;align-items:center"><span class="tier ${esc(m.tier)}">${esc(m.tier)}</span><span class="chip ${m.status}">${m.status[0]+m.status.slice(1).toLowerCase()}</span></span></div>`).join('')}
+          ${ms.map(m=>`<div class="npitem"><div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}</div></div><span class="st" style="display:flex;gap:7px;align-items:center">${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:''}<span class="chip ${m.status}">${esc(statusLabel(m))}</span></span></div>`).join('')}
         </div></div>
       </div>
       <p style="text-align:center;color:var(--faint);font-size:12px;margin-top:18px">NubridgeMD · Physician collaboration record · read-only shared view</p>
