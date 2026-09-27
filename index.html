@@ -94,6 +94,22 @@ tbody tr:hover{background:var(--surface2)}
 .supin:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,137,252,.12);background:var(--surface)}
 .supin::placeholder{color:var(--faint)}
 .supwrap{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11.5px;color:var(--muted)}
+/* Manual-match modal */
+.mscrim{position:fixed;inset:0;background:rgba(11,37,69,.42);backdrop-filter:blur(2px);z-index:70;opacity:0;pointer-events:none;transition:opacity .18s}
+.mscrim.open{opacity:1;pointer-events:auto}
+.modal{position:fixed;z-index:80;left:50%;top:50%;transform:translate(-50%,-48%);width:min(500px,calc(100% - 32px));max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:16px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.mhead{background:var(--navy);color:#fff;padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
+.mhead h3{font-size:17px}
+.mhead .x{background:rgba(255,255,255,.12);border:0;color:#fff;width:30px;height:30px;border-radius:8px;font-size:16px;line-height:1}
+.mbody{padding:18px 20px}
+.mbody .f{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.mbody label{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.mbody input,.mbody select{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--ink);background:var(--surface)}
+.mbody input:focus,.mbody select:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,137,252,.12)}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mfoot{display:flex;gap:9px;justify-content:flex-end;margin-top:6px}
+@media (max-width:480px){.mrow{grid-template-columns:1fr}}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
 
 /* Doctor grid */
@@ -203,6 +219,9 @@ tbody tr:hover{background:var(--surface2)}
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true"></aside>
 <div class="toast" id="toast"></div>
 
+<div class="mscrim" id="mscrim" onclick="closeMatchModal()"></div>
+<div class="modal" id="matchModal" role="dialog" aria-modal="true" aria-label="Match users"></div>
+
 <script>
 /* ---------------- Sample data (mirrors real MatchRecord shape) ---------------- */
 const DOCTORS = [
@@ -261,6 +280,14 @@ function saveSup(){ try{ localStorage.setItem(LS_SUP, JSON.stringify(matchSup));
 let matchSup = loadSup();
 function supFor(m){ return matchSup[m.matchGuid] != null ? matchSup[m.matchGuid] : (m.sup || ''); }
 function setSup(el){ matchSup[el.getAttribute('data-guid')] = el.value; saveSup(); }
+
+// Admin-created (manual) matches + doctors, persisted for the prototype.
+const LS_CUSTOM='nbmd_custom_v1';
+function loadCustom(){ try{ return JSON.parse(localStorage.getItem(LS_CUSTOM)||'{"doctors":[],"matches":[]}'); }catch(e){ return {doctors:[],matches:[]}; } }
+let custom = loadCustom();
+function saveCustom(){ try{ localStorage.setItem(LS_CUSTOM, JSON.stringify(custom)); }catch(e){} }
+(custom.doctors||[]).forEach(d=>{ if(!DOCTORS.find(x=>x.id===d.id)) DOCTORS.push(d); });
+(custom.matches||[]).forEach(m=>{ if(!MATCHES.find(x=>x.matchGuid===m.matchGuid)) MATCHES.push(m); });
 function doctor(id){ const base = DOCTORS.find(d=>d.id===id); return Object.assign({}, base, overrides[id]||{}); }
 function matchesFor(id){ return MATCHES.filter(m=>m.mdId===id); }
 function counts(id){ const ms=matchesFor(id); return {a:ms.filter(m=>m.status==='ACCEPTED').length, p:ms.filter(m=>m.status==='PENDING').length, r:ms.filter(m=>m.status==='REJECTED').length, total:ms.length}; }
@@ -290,7 +317,7 @@ function render(){
           <h1>Matching</h1>
           <p>Physician–NP collaborations. Switch to <b>By&nbsp;doctor</b> to open each matched physician's account, review every NP linked to them, edit their details, and copy a shareable read-only link.</p>
         </div>
-        <button class="btn primary" onclick="toast('Match Users — opens the manual matching flow in the live app')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Match Users</button>
+        <button class="btn primary" onclick="openMatchModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Match Users</button>
       </div>
 
       <div class="controls">
@@ -517,6 +544,74 @@ function setView(v){ view=v; render(); }
 function setStatus(s){ statusFilter=s; render(); }
 let qt; function setQuery(v){ query=v; clearTimeout(qt); qt=setTimeout(render,140); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* ---------------- Manual matching (admin) ---------------- */
+function openMatchModal(){
+  const opts = DOCTORS.map(d=>`<option value="${esc(d.id)}">${esc(d.name)} (${esc(d.email)})</option>`).join('');
+  document.getElementById('matchModal').innerHTML = `
+    <div class="mhead"><h3>Match users</h3><button class="x" onclick="closeMatchModal()" aria-label="Close">×</button></div>
+    <div class="mbody">
+      <div class="f"><label>Physician</label>
+        <select id="mm_doc" onchange="mmToggleNewDoc()">
+          ${opts}
+          <option value="__new">➕  Add new physician…</option>
+        </select>
+      </div>
+      <div id="mm_newdoc" hidden>
+        <div class="mrow">
+          <div class="f"><label>New physician name</label><input id="mm_dname" placeholder="Dr. Jane Doe"></div>
+          <div class="f"><label>New physician email</label><input id="mm_demail" placeholder="jane@example.com"></div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="f"><label>Nurse practitioner name</label><input id="mm_npname" placeholder="Full name"></div>
+        <div class="f"><label>NP email</label><input id="mm_npemail" placeholder="np@example.com"></div>
+      </div>
+      <div class="mrow">
+        <div class="f"><label>NP tier</label><select id="mm_tier"><option value="">—</option><option>StartUp</option><option>Standard</option><option>Premium</option></select></div>
+        <div class="f"><label>Supervising state(s)</label><input id="mm_sup" placeholder="e.g. TX, GA"></div>
+      </div>
+      <div class="mfoot">
+        <button class="btn ghost sm" onclick="closeMatchModal()">Cancel</button>
+        <button class="btn primary sm" onclick="createManualMatch()">Create match</button>
+      </div>
+    </div>`;
+  document.getElementById('matchModal').classList.add('open');
+  document.getElementById('mscrim').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeMatchModal(){
+  document.getElementById('matchModal').classList.remove('open');
+  document.getElementById('mscrim').classList.remove('open');
+  document.body.style.overflow='';
+}
+function mmToggleNewDoc(){
+  const v=document.getElementById('mm_doc').value;
+  document.getElementById('mm_newdoc').hidden = (v!=='__new');
+}
+function createManualMatch(){
+  const docSel=document.getElementById('mm_doc').value;
+  const npName=document.getElementById('mm_npname').value.trim();
+  const npEmail=document.getElementById('mm_npemail').value.trim();
+  if(!npName||!npEmail){ toast('Enter the NP name and email'); return; }
+  let mdId=docSel;
+  if(docSel==='__new'){
+    const dn=document.getElementById('mm_dname').value.trim();
+    const de=document.getElementById('mm_demail').value.trim();
+    if(!dn||!de){ toast('Enter the new physician name and email'); return; }
+    mdId='md-custom-'+Date.now();
+    const nd={id:mdId,name:dn,email:de,phone:'',npi:'',specialty:'',address:'',states:'',capacity:'',cred:'Not set',notes:''};
+    custom.doctors.push(nd); DOCTORS.push(nd);
+  }
+  const guid='M-'+Date.now();
+  const m={matchGuid:guid,mdId,npName,npEmail,status:'ACCEPTED',sd:'Completed',createdAt:new Date().toISOString().slice(0,10),tier:document.getElementById('mm_tier').value||'',paidAt:''};
+  custom.matches.push(m); MATCHES.push(m);
+  const sup=document.getElementById('mm_sup').value.trim(); if(sup){ matchSup[guid]=sup; saveSup(); }
+  saveCustom();
+  closeMatchModal();
+  view='match'; statusFilter='ALL'; render();
+  toast('Match created');
+}
 
 window.addEventListener('hashchange',render);
 render();
