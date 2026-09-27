@@ -68,7 +68,7 @@ a{color:var(--blue-d)}
 /* Card / table */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
 .tablewrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:780px;font-size:13.5px}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13.5px}
 thead th{text-align:left;background:var(--surface2);color:var(--muted);font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--line)}
 tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);vertical-align:middle}
 tbody tr:last-child td{border-bottom:0}
@@ -90,6 +90,10 @@ tbody tr:hover{background:var(--surface2)}
 .tier.Premium{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-line)}
 .paid{white-space:nowrap}
 .paid .none{color:var(--faint)}
+.supin{width:130px;max-width:100%;border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12.5px;font-family:inherit;color:var(--ink);background:var(--surface2)}
+.supin:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,137,252,.12);background:var(--surface)}
+.supin::placeholder{color:var(--faint)}
+.supwrap{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11.5px;color:var(--muted)}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
 
 /* Doctor grid */
@@ -251,6 +255,12 @@ const LS_KEY='nbmd_md_accounts_v1';
 function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(e){ return {}; } }
 function saveOverrides(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); }catch(e){} }
 let overrides = loadOverrides();
+const LS_SUP='nbmd_match_sup_v1';
+function loadSup(){ try{ return JSON.parse(localStorage.getItem(LS_SUP)||'{}'); }catch(e){ return {}; } }
+function saveSup(){ try{ localStorage.setItem(LS_SUP, JSON.stringify(matchSup)); }catch(e){} }
+let matchSup = loadSup();
+function supFor(m){ return matchSup[m.matchGuid] != null ? matchSup[m.matchGuid] : (m.sup || ''); }
+function setSup(el){ matchSup[el.getAttribute('data-guid')] = el.value; saveSup(); }
 function doctor(id){ const base = DOCTORS.find(d=>d.id===id); return Object.assign({}, base, overrides[id]||{}); }
 function matchesFor(id){ return MATCHES.filter(m=>m.mdId===id); }
 function counts(id){ const ms=matchesFor(id); return {a:ms.filter(m=>m.status==='ACCEPTED').length, p:ms.filter(m=>m.status==='PENDING').length, r:ms.filter(m=>m.status==='REJECTED').length, total:ms.length}; }
@@ -314,10 +324,11 @@ function matchView(){
   const rows=matchesFiltered();
   if(!rows.length) return `<div class="card"><div class="empty">No matches for this filter.</div></div>`;
   return `<div class="card"><div class="tablewrap"><table>
-    <thead><tr><th>Physician</th><th>Nurse Practitioner</th><th>NP Tier</th><th>Status</th><th>Date created</th><th>Payment date</th><th></th></tr></thead>
+    <thead><tr><th>Physician</th><th>Nurse Practitioner</th><th>Supervising state(s)</th><th>NP Tier</th><th>Status</th><th>Date created</th><th>Payment date</th><th></th></tr></thead>
     <tbody>${rows.map(m=>{const d=doctor(m.mdId);return `<tr>
       <td><div class="person"><div class="pa md">${esc(initials(d.name))}</div><div style="min-width:0"><div class="nm">${esc(d.name)}</div><div class="em">${esc(d.email)}</div></div></div></td>
       <td><div class="person"><div class="pa np">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)}</div></div></div></td>
+      <td><input class="supin" data-guid="${esc(m.matchGuid)}" value="${esc(supFor(m))}" placeholder="Add state(s)" title="State(s) this doctor supervises this NP in" onchange="setSup(this)"></td>
       <td>${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:'<span class="paid"><span class="none">—</span></span>'}</td>
       <td><span class="chip ${m.status}">${esc(statusLabel(m))}</span></td>
       <td class="tnum" style="color:var(--muted)">${esc(fmtD(m.createdAt))}</td>
@@ -420,7 +431,8 @@ function drawerHTML(id){
           <div class="nplist">
             ${ms.length?ms.map(m=>`<div class="npitem">
               <div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div>
-              <div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}</div></div>
+              <div style="min-width:0;flex:1"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}</div>
+                <div class="supwrap">Supervising in: <input class="supin" data-guid="${esc(m.matchGuid)}" value="${esc(supFor(m))}" placeholder="Add state(s)" onchange="setSup(this)"></div></div>
               <span class="st" style="display:flex;gap:7px;align-items:center">${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:''}<span class="chip ${m.status}">${esc(statusLabel(m))}</span></span>
             </div>`).join(''):'<div style="color:var(--muted);font-size:13px">No NPs matched yet.</div>'}
           </div>
@@ -493,7 +505,7 @@ function renderShared(id){
       <div class="sect">
         <div class="sh"><h4>Matched nurse practitioners (${c.total})</h4></div>
         <div class="sb"><div class="nplist">
-          ${ms.map(m=>`<div class="npitem"><div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}</div></div><span class="st" style="display:flex;gap:7px;align-items:center">${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:''}<span class="chip ${m.status}">${esc(statusLabel(m))}</span></span></div>`).join('')}
+          ${ms.map(m=>`<div class="npitem"><div class="pa np" style="width:34px;height:34px">${esc(initials(m.npName))}</div><div style="min-width:0"><div class="nm">${esc(m.npName)}</div><div class="em">${esc(m.npEmail)} · matched ${esc(fmtD(m.createdAt))}${m.paidAt?' · paid '+esc(fmtD(m.paidAt)):''}${supFor(m)?' · supervising in '+esc(supFor(m)):''}</div></div><span class="st" style="display:flex;gap:7px;align-items:center">${m.tier?`<span class="tier ${esc(m.tier)}">${esc(m.tier)}</span>`:''}<span class="chip ${m.status}">${esc(statusLabel(m))}</span></span></div>`).join('')}
         </div></div>
       </div>
       <p style="text-align:center;color:var(--faint);font-size:12px;margin-top:18px">NubridgeMD · Physician collaboration record · read-only shared view</p>
